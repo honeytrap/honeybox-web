@@ -16,7 +16,7 @@ import { AppState } from '../../../rootReducer';
 import {ResizableBox} from 'react-resizable';
 import * as throttle from 'lodash.throttle';
 
-import XTerm from '../xterm';
+import XTerm from '../xTermComponent/xTermComponent';
 import StatusBar from '../statusBar/statusBar';
 import * as styles from './sandbox.css';
 import Network from '../network/network';
