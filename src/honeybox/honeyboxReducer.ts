@@ -48,7 +48,7 @@ export function honeyboxReducer(state: HoneyboxState = defaultHoneyboxState, act
 		case StdErr.type: {
 			const stdOut: StdOutInterface = {
 				id: uniqueId(),
-				data: b64DecodeUnicode(action.payload.data).replace(/\r?\n/g, '\r'),
+				data: b64DecodeUnicode(action.payload.data).replace(/\r?\n/g, '\r\n'),
 				type: 'error'
 			};
 
