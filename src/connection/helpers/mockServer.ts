@@ -1,4 +1,4 @@
-import { Server } from '../../honeyfarm/interfaces/server';
+import { Server } from '../../honeybox/interfaces/server';
 
 interface Response {
 	willRespond: Function;

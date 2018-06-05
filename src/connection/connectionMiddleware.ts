@@ -14,7 +14,7 @@ import {
 	AgentList,
 	AttackList, EventList, SensorList,
 	ServerList
-} from '../honeyfarm/honeyfarmActions';
+} from '../honeybox/honeyboxActions';
 
 let opened: Promise<ReconnectingWebsocket>;
 

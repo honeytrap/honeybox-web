@@ -5,7 +5,7 @@ import {
 	AttackList,
 	EventList,
 	SensorList, ServerList
-} from './honeyfarmActions';
+} from './honeyboxActions';
 import { Server } from './interfaces/server';
 import { Sensor } from './interfaces/sensor';
 import { ObjectMap } from '../shared/interfaces/objectMap';
@@ -34,7 +34,7 @@ const arrayToMap = (array: any[], idProp: string): ObjectMap<any> => {
 	return map;
 };
 
-export function honeyfarmReducer(state: HoneyfarmState = defaultHoneyfarmState, action): HoneyfarmState {
+export function honeyboxReducer(state: HoneyfarmState = defaultHoneyfarmState, action): HoneyfarmState {
     console.log('action', action);
 	switch (action.type) {
 		case AgentList.type: {

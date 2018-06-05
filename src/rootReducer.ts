@@ -9,15 +9,15 @@ import {
 import { combineReducers } from 'redux';
 import {
 	defaultHoneyfarmState,
-	honeyfarmReducer,
+	honeyboxReducer,
 	HoneyfarmState
-} from './honeyfarm/honeyfarmReducer';
+} from './honeybox/honeyboxReducer';
 
 export const rootReducer = combineReducers({
 	sessions: connectionReducer,
 	authentication: authenticationReducer,
 	connection: connectionReducer,
-	honeyfarm: honeyfarmReducer
+	honeyfarm: honeyboxReducer
 });
 
 export interface AppState {

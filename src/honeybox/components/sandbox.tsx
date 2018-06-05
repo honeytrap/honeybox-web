@@ -74,7 +74,7 @@ class Sandbox extends React.Component<any, State> {
                         }} >
 
                         <button onClick={ () => {
-                            var socket = new WebSocket('ws://172.16.84.198:8089/console');
+                            var socket = new WebSocket('ws://172.30.140.186:8089/console');
                             this.xterm.current.terminadoAttach(socket, true, true);
 
                             runFakeTerminal(this.xterm.current);
