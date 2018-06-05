@@ -35,7 +35,7 @@ export function honeyboxReducer(state: HoneyboxState = defaultHoneyboxState, act
 		case StdOut.type: {
 			const stdOut: StdOutInterface = {
 				id: uniqueId(),
-				data: b64DecodeUnicode(action.payload.data),
+				data: b64DecodeUnicode(action.payload.data).replace(/\r?\n/g, '\r\n'),
 				type: 'normal'
 			};
 
@@ -45,10 +45,10 @@ export function honeyboxReducer(state: HoneyboxState = defaultHoneyboxState, act
 			};
 		}
 
-		case StdErr: {
+		case StdErr.type: {
 			const stdOut: StdOutInterface = {
 				id: uniqueId(),
-				data: b64DecodeUnicode(action.payload.data).replace('\n', '\r'),
+				data: b64DecodeUnicode(action.payload.data).replace(/\r?\n/g, '\r'),
 				type: 'error'
 			};
 

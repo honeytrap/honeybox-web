@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Terminal } from 'xterm';
+import * as XTerm from 'xterm';
+import { fit } from 'xterm/lib/addons/fit/fit';
 
-// import styles from 'xterm/xterm.css';
 import '../../../node_modules/xterm/dist/xterm.css';
 import { connect } from 'react-redux';
 import { StdIn } from '../honeyboxActions';
@@ -9,8 +9,7 @@ import { AppState } from '../../rootReducer';
 import { StdOutInterface } from '../interfaces/stdOutInterface';
 
 const className = require('classnames');
-// const debounce = require('lodash.debounce');
-// require ('xterm/xterm.css');
+
 export interface IXtermProps extends React.DOMAttributes<{}> {
     onChange?: (e) => void;
     onInput?: (e) => void;
@@ -30,60 +29,43 @@ export interface IXtermState {
     isFocused: boolean;
 }
 
-declare module "xterm" 
-{
-    interface Terminal 
-    {
-        terminadoAttach(socket: any, bidirectional?: Boolean, buffered?: Boolean);
-        terminadoDetach(socket: any);
+// declare module "xterm"
+// {
+//     interface Terminal
+//     {
+//         terminadoAttach(socket: any, bidirectional?: Boolean, buffered?: Boolean);
+//         terminadoDetach(socket: any);
+//
+//         attach(socket: any, bidirectional?: Boolean, buffered?: Boolean);
+//         detach(socket: any);
+//
+//         fit(term: Terminal): void;
+//     }
+// }
 
-        attach(socket: any, bidirectional?: Boolean, buffered?: Boolean);
-        detach(socket: any);
-
-        fit(term: Terminal): void;
-    }
-}
-
-class XTerm extends React.Component<IXtermProps, IXtermState> {
-    xterm: Terminal;
+class XTermComponent extends React.Component<IXtermProps, IXtermState> {
+    xterm: XTerm.Terminal;
     container: HTMLDivElement;
     input: string = '';
     writtenIds: string[] = [];
-
-    constructor(props?: IXtermProps, context?: any) {
-        super(props, context);
-        this.state = {
-            isFocused: false
-        };
-    }
-
-    terminadoAttach(socket: any, bidirectional?: Boolean, buffered?: Boolean) {
-        this.xterm.attach(socket, bidirectional, buffered);
-    }
-
-    terminadoDetach(socket: any) {
-        this.xterm.detach(socket);
-    }
-
-    fit(): void {
-        this.xterm.fit(null);
-    }
-
-    applyAddon(addon) {
-        Terminal.applyAddon(addon);
-    }
+	state = {
+		isFocused: false
+	};
 
     componentDidMount() {
-        console.log('xterm mounted');
+        // if (this.props.addons) {
+        //     this.props.addons.forEach(s => {
+        //         const addon = require(`xterm/dist/addons/${s}/${s}`);
+        //         Terminal.applyAddon(addon);
+        //     });
+        // }
+        this.xterm = new XTerm.Terminal(this.props.options);
 
-        if (this.props.addons) {
-            this.props.addons.forEach(s => {
-                const addon = require(`xterm/dist/addons/${s}/${s}`);
-                Terminal.applyAddon(addon);
-            });
-        }
-        this.xterm = new Terminal(this.props.options);
+
+
         this.xterm.open(this.container);
+
+		fit(this.xterm);
         this.xterm.on('focus', this.focusChanged.bind(this, true));
         this.xterm.on('blur', this.focusChanged.bind(this, false));
         if (this.props.onContextMenu) {
@@ -95,17 +77,11 @@ class XTerm extends React.Component<IXtermProps, IXtermState> {
         if (this.props.value) {
             this.xterm.write(this.props.value);
         }
-		//
-		// var socket = new WebSocket('ws://172.30.140.186:8089/ws');
-		//
-		// socket.onopen = () => {
-		// 	socket.send(JSON.stringify({type: 'stdin', payload: { data: 'ls\n' }}));
-		// }
-		//
-		// this.xterm.terminadoAttach(socket, true, true);
+
 
 		this.runFakeTerminal();
     }
+
     componentWillUnmount() {
         // is there a lighter-weight way to remove the cm instance?
         if (this.xterm) {
@@ -113,11 +89,7 @@ class XTerm extends React.Component<IXtermProps, IXtermState> {
             this.xterm = null;
         }
     }
-    // componentWillReceiveProps(nextProps) {
-    //     if (nextProps.hasOwnProperty('value')) {
-    //         this.setState({ value: nextProps.value });
-    //     }
-    // }
+
     shouldComponentUpdate(nextProps, nextState) {
 		    // console.log('shouldComponentUpdate', nextProps.hasOwnProperty('value'), nextProps.value != this.props.value);
         if (nextProps.hasOwnProperty('value') && nextProps.value != this.props.value) {
@@ -173,6 +145,7 @@ class XTerm extends React.Component<IXtermProps, IXtermState> {
 
 		dispatch(new StdIn({ data: this.input + "\n"}));
 		this.input = '';
+		this.xterm.write('\r\n');
 	}
 
 	componentWillReceiveProps(nextProps: IXtermProps) {
@@ -184,11 +157,11 @@ class XTerm extends React.Component<IXtermProps, IXtermState> {
 			);
 
     		unwritten.forEach(out => {
-				this.xterm.writeln(out.data);
+				this.xterm.write(out.data);
 				this.writtenIds.push(out.id);
 			});
 
-			this.xterm.write('\r\n$ ');
+			this.xterm.write('$ ');
 		}
 	}
 
@@ -216,7 +189,7 @@ class XTerm extends React.Component<IXtermProps, IXtermState> {
 			}
 		});
 
-		this.xterm.on('paste', function (data, ev) {
+		this.xterm.on('paste',  (data, ev) => {
 			this.xterm.write(data);
 		});
 	}
@@ -231,4 +204,4 @@ const select = (state: AppState) => ({
 	stdOut: state.honeyfarm.stdOut
 });
 
-export default connect(select)(XTerm);
+export default connect(select)(XTermComponent);

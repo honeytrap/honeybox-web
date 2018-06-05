@@ -29,8 +29,6 @@ export const connectionMiddleware: Middleware = ({dispatch}) => next => (action:
 		}
 	}
 
-	console.log(action);
-
 	if (action.sendToServer === true) {
             const stringified: string = JSON.stringify(action);
 
@@ -69,6 +67,7 @@ function onMessage(event, dispatch: Dispatch<any>) {
 
 	if (className) {
 		const action = new (className as any)(data.payload);
+
 		return dispatch(action);
 	}
 
