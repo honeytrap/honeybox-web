@@ -1,4 +1,10 @@
-import { Event, SetMessageFilter, StdErr, StdOut } from './honeyboxActions';
+import {
+	Event,
+	Info,
+	SetMessageFilter,
+	StdErr,
+	StdOut
+} from './honeyboxActions';
 import { StdOutInterface } from './interfaces/stdOutInterface';
 import { uniqueId } from 'lodash'
 import { Message } from './interfaces/message';
@@ -7,12 +13,14 @@ export interface HoneyboxState {
 	stdOut: StdOutInterface[];
 	messages: Message[];
 	messageFilter: string;
+	name: string;
 }
 
 export const defaultHoneyboxState: HoneyboxState = {
 	stdOut: [],
 	messages: [],
-	messageFilter: ''
+	messageFilter: '',
+	name: ''
 };
 
 function b64DecodeUnicode(str) {
@@ -65,6 +73,13 @@ export function honeyboxReducer(state: HoneyboxState = defaultHoneyboxState, act
 			return {
 				...state,
 				messageFilter: action.payload.query
+			};
+		}
+
+		case Info.type: {
+			return {
+				...state,
+				name: action.payload.name
 			};
 		}
 

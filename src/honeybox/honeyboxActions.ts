@@ -7,3 +7,4 @@ export const WriteStdOut = createClientAction<{ data: string }>('honeybox.writeS
 export const Event = createClientAction<{ data: string }>('event');
 export const StdErr = createClientAction<{ data: string }>('stderr');
 export const SetMessageFilter = createClientAction<{ query: string }>('honeybox.setMessageFilter');
+export const Info = createClientAction<{ name: string }>('info');

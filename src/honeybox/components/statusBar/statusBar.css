@@ -1,6 +1,8 @@
 .statusBar {
   line-height: 40px;
   margin: 0 15px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .connection {
@@ -27,4 +29,11 @@
 
 .notConnected {
   background: #aa1b21;
+}
+
+.name {
+  margin: 0;
+  font-size: 1em;
+  line-height: 40px;
+  font-weight: bold;
 }

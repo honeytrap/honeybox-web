@@ -2,7 +2,7 @@ import ReconnectingWebsocket from 'reconnecting-websocket';
 import { Dispatch, Middleware } from 'redux';
 import { Connect, Connected } from './connectionActions';
 import { getResponse } from './helpers/mockServer';
-import { Event, StdErr, StdOut } from '../honeybox/honeyboxActions';
+import { Event, Info, StdErr, StdOut } from '../honeybox/honeyboxActions';
 
 let opened: Promise<ReconnectingWebsocket>;
 
@@ -61,7 +61,8 @@ function onMessage(event, dispatch: Dispatch<any>) {
 	const actionsFromServer = [
 		StdOut,
 		Event,
-		StdErr
+		StdErr,
+		Info
 	];
 
 	const className = actionsFromServer.find(action => action.type === data.type);
