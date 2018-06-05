@@ -65,6 +65,8 @@ export default class XTerm extends React.Component<IXtermProps, IXtermState> {
     }
 
     componentDidMount() {
+        console.log('xterm mounted');
+
         if (this.props.addons) {
             this.props.addons.forEach(s => {
                 const addon = require(`xterm/dist/addons/${s}/${s}`);
@@ -84,6 +86,16 @@ export default class XTerm extends React.Component<IXtermProps, IXtermState> {
         if (this.props.value) {
             this.xterm.write(this.props.value);
         }
+
+		var socket = new WebSocket('ws://172.30.140.186:8089/ws');
+
+		socket.onopen = () => {
+			socket.send(JSON.stringify({type: 'stdin', payload: { data: 'ls\n' }}));
+		}
+
+		this.xterm.terminadoAttach(socket, true, true);
+
+		this.runFakeTerminal();
     }
     componentWillUnmount() {
         // is there a lighter-weight way to remove the cm instance?
@@ -147,7 +159,42 @@ export default class XTerm extends React.Component<IXtermProps, IXtermState> {
         this.props.onContextMenu && this.props.onContextMenu(e);
     }
 
-    render() {
+	runFakeTerminal() {
+		var shellprompt = '$ ';
+
+		const prompt = () => {
+			this.xterm.write('\r\n' + shellprompt);
+		};
+		this.xterm.writeln('Welcome to xterm.js');
+		this.xterm.writeln('This is a local terminal emulation, without a real terminal in the back-end.');
+		this.xterm.writeln('Type some keys and commands to play around.');
+		this.xterm.writeln('');
+		prompt();
+
+		this.xterm.on('key',  (key, ev) => {
+			var printable = (
+				!ev.altKey && !ev.ctrlKey && !ev.metaKey
+			);
+
+			if (ev.keyCode == 13) {
+				prompt();
+				// } else if (ev.keyCode == 8) {
+				//   // Do not delete the prompt
+				//   if (term['x'] > 2) {
+				//     xterm.write('\b \b');
+				//   }
+			} else if (printable) {
+				this.xterm.write(key);
+			}
+		});
+
+		this.xterm.on('paste', function (data, ev) {
+			this.xterm.write(data);
+		});
+	}
+
+
+	render() {
         const terminalClassName = className('ReactXTerm', this.state.isFocused ? 'ReactXTerm--focused' : null, this.props.className);
         return <div ref={ref => (this.container = ref)} className={terminalClassName} />;
     }

@@ -1,4 +1,4 @@
-import Sandbox from './honeybox/components/sandbox';
+import Sandbox from './honeybox/components/sandbox/sandbox';
 import LoginForm from './authentication/components/loginForm/loginForm';
 import SignUpForm from './authentication/components/signUpForm/signUpForm';
 

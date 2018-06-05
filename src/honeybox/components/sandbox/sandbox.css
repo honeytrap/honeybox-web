@@ -1,0 +1,37 @@
+.layout {
+    height: 100%;
+    background: #334353;
+    color: white;
+}
+
+.header {
+    background: #435A74;
+    height: 40px;
+    border-bottom: 1px solid #26323E;
+}
+
+.subLayout {
+    display: flex;
+    height: calc(100% - 30px);
+}
+
+.layoutLeft {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.main {
+    flex-grow: 1;
+}
+
+.aside {
+    width: 300px;
+    background: #3D5168;
+    padding: 15px;
+}
+
+.footer {
+    height: 300px;
+}
+

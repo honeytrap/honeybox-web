@@ -33,6 +33,7 @@ import { connectionMiddleware } from './connection/connectionMiddleware';
 import { defaultAppState, rootReducer } from './rootReducer';
 import { authenticationMiddleware } from './authentication/authenticationMiddleware';
 import { I18nextProvider } from "react-i18next";
+import './global.scss';
 
 const clientVersion = process.env.CLIENT_VERSION;
 
@@ -73,15 +74,13 @@ if (params.get('ref'))
 	localStorage.setItem('ref', params.get('ref'));
 
 const load = () => render((
-	<div>
-		<Provider store={store}>
-			<ConnectedRouter history={history}>
-				<I18nextProvider i18n={i18n}>
-					<App />
-				</I18nextProvider>
-			</ConnectedRouter>
-		</Provider>
-	</div>
+	<Provider store={store}>
+		<ConnectedRouter history={history}>
+			<I18nextProvider i18n={i18n}>
+				<App />
+			</I18nextProvider>
+		</ConnectedRouter>
+	</Provider>
 ), document.getElementById('root'));
 
 load();

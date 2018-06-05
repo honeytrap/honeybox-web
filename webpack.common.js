@@ -83,8 +83,36 @@ module.exports = {
 					]
 				}))
 			},
+
+			{
+				// Css files in src/app/ are modular (module: true in the css-loader config)
+				// This means that the class names are prefixed and suffixed with a hash to make them scoped
+				test: /\.(css)$/,
+				exclude: [
+					path.join(__dirname, 'node_modules'),
+				],
+				use: [
+					{
+						loader: 'style-loader',
+					},
+					{
+						loader: 'css-loader',
+						options: {
+							modules: true,
+							localIdentName: '[name]__[local]--[hash:base64:5]'
+						}
+					},
+					{
+						loader: 'sass-loader'
+					}
+				]
+			},
+
 			{
 				test: /\.css$/,
+				exclude: [
+					path.join(__dirname, 'src'),
+				],
 				use: extractCSS.extract({
 					fallback: 'style-loader',
 					use: 'css-loader'
