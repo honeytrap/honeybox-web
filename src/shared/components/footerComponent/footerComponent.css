@@ -1,0 +1,28 @@
+.footerComponent {
+    border-top: 1px solid rgba(0, 0, 0, .3);
+    flex-grow: 1;
+    overflow-y: auto;
+    width: 100%;
+    min-height: 41px;
+}
+
+.header {
+    height: 40px;
+    padding: 0 15px;
+    background: #435A74;
+    border-bottom: 1px solid rgba(0, 0, 0, .3);
+    font-size: 1em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    line-height: 40px;
+    font-size: 1.2em;
+    margin: 0;
+}
+
+.content {
+    padding: 15px;
+}

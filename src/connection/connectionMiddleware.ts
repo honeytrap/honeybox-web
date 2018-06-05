@@ -1,20 +1,8 @@
 import ReconnectingWebsocket from 'reconnecting-websocket';
 import { Dispatch, Middleware } from 'redux';
 import { Connect, Connected } from './connectionActions';
-import {
-	LoginFailed,
-	LoginSuccess,
-	ResumeSessionFailed,
-	ResumeSessionSuccess,
-	SignUpFailed,
-	SignUpSuccess
-} from '../authentication/authenticationActions';
 import { getResponse } from './helpers/mockServer';
-import {
-	AgentList,
-	AttackList, EventList, SensorList,
-	ServerList
-} from '../honeybox/honeyboxActions';
+import { Event, StdErr, StdOut } from '../honeybox/honeyboxActions';
 
 let opened: Promise<ReconnectingWebsocket>;
 
@@ -41,8 +29,13 @@ export const connectionMiddleware: Middleware = ({dispatch}) => next => (action:
 		}
 	}
 
+	console.log(action);
+
 	if (action.sendToServer === true) {
             const stringified: string = JSON.stringify(action);
+
+            action = { ...action };
+            delete action.sendToServer;
 
             if (process.env.NODE_ENV !== 'production') {
                 console.log('Send', action);
@@ -66,17 +59,9 @@ function onMessage(event, dispatch: Dispatch<any>) {
 	const data = JSON.parse(event.data);
 
 	const actionsFromServer = [
-		LoginSuccess,
-		LoginFailed,
-		ResumeSessionSuccess,
-		ResumeSessionFailed,
-		SignUpSuccess,
-		SignUpFailed,
-		ServerList,
-		AttackList,
-		AgentList,
-		SensorList,
-		EventList
+		StdOut,
+		Event,
+		StdErr
 	];
 
 	const className = actionsFromServer.find(action => action.type === data.type);

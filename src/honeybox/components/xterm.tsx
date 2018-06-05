@@ -3,6 +3,10 @@ import { Terminal } from 'xterm';
 
 // import styles from 'xterm/xterm.css';
 import '../../../node_modules/xterm/dist/xterm.css';
+import { connect } from 'react-redux';
+import { StdIn } from '../honeyboxActions';
+import { AppState } from '../../rootReducer';
+import { StdOutInterface } from '../interfaces/stdOutInterface';
 
 const className = require('classnames');
 // const debounce = require('lodash.debounce');
@@ -19,6 +23,8 @@ export interface IXtermProps extends React.DOMAttributes<{}> {
     value?: string;
     className?: string;
     style?: React.CSSProperties;
+    dispatch: any;
+    stdOut: StdOutInterface[];
 }
 export interface IXtermState {
     isFocused: boolean;
@@ -38,9 +44,12 @@ declare module "xterm"
     }
 }
 
-export default class XTerm extends React.Component<IXtermProps, IXtermState> {
+class XTerm extends React.Component<IXtermProps, IXtermState> {
     xterm: Terminal;
     container: HTMLDivElement;
+    input: string = '';
+    writtenIds: string[] = [];
+
     constructor(props?: IXtermProps, context?: any) {
         super(props, context);
         this.state = {
@@ -86,14 +95,14 @@ export default class XTerm extends React.Component<IXtermProps, IXtermState> {
         if (this.props.value) {
             this.xterm.write(this.props.value);
         }
-
-		var socket = new WebSocket('ws://172.30.140.186:8089/ws');
-
-		socket.onopen = () => {
-			socket.send(JSON.stringify({type: 'stdin', payload: { data: 'ls\n' }}));
-		}
-
-		this.xterm.terminadoAttach(socket, true, true);
+		//
+		// var socket = new WebSocket('ws://172.30.140.186:8089/ws');
+		//
+		// socket.onopen = () => {
+		// 	socket.send(JSON.stringify({type: 'stdin', payload: { data: 'ls\n' }}));
+		// }
+		//
+		// this.xterm.terminadoAttach(socket, true, true);
 
 		this.runFakeTerminal();
     }
@@ -159,17 +168,34 @@ export default class XTerm extends React.Component<IXtermProps, IXtermState> {
         this.props.onContextMenu && this.props.onContextMenu(e);
     }
 
-	runFakeTerminal() {
-		var shellprompt = '$ ';
+    prompt() {
+    	const { dispatch } = this.props;
 
-		const prompt = () => {
-			this.xterm.write('\r\n' + shellprompt);
-		};
-		this.xterm.writeln('Welcome to xterm.js');
-		this.xterm.writeln('This is a local terminal emulation, without a real terminal in the back-end.');
-		this.xterm.writeln('Type some keys and commands to play around.');
-		this.xterm.writeln('');
-		prompt();
+		dispatch(new StdIn({ data: this.input + "\n"}));
+		this.input = '';
+	}
+
+	componentWillReceiveProps(nextProps: IXtermProps) {
+    	const { stdOut } = this.props;
+
+    	if (nextProps.stdOut !== stdOut) {
+    		const unwritten = nextProps.stdOut.filter(out =>
+				this.writtenIds.indexOf(out.id) === -1
+			);
+
+    		unwritten.forEach(out => {
+				this.xterm.writeln(out.data);
+				this.writtenIds.push(out.id);
+			});
+
+			this.xterm.write('\r\n$ ');
+		}
+	}
+
+	runFakeTerminal() {
+		this.prompt();
+
+		this.xterm.write('$ ');
 
 		this.xterm.on('key',  (key, ev) => {
 			var printable = (
@@ -177,7 +203,8 @@ export default class XTerm extends React.Component<IXtermProps, IXtermState> {
 			);
 
 			if (ev.keyCode == 13) {
-				prompt();
+				this.prompt();
+
 				// } else if (ev.keyCode == 8) {
 				//   // Do not delete the prompt
 				//   if (term['x'] > 2) {
@@ -185,6 +212,7 @@ export default class XTerm extends React.Component<IXtermProps, IXtermState> {
 				//   }
 			} else if (printable) {
 				this.xterm.write(key);
+				this.input += key;
 			}
 		});
 
@@ -193,11 +221,14 @@ export default class XTerm extends React.Component<IXtermProps, IXtermState> {
 		});
 	}
 
-
 	render() {
         const terminalClassName = className('ReactXTerm', this.state.isFocused ? 'ReactXTerm--focused' : null, this.props.className);
         return <div ref={ref => (this.container = ref)} className={terminalClassName} />;
     }
 }
 
-export { Terminal, XTerm };
+const select = (state: AppState) => ({
+	stdOut: state.honeyfarm.stdOut
+});
+
+export default connect(select)(XTerm);

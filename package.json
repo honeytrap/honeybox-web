@@ -90,6 +90,7 @@
     "redux": "^3.7.2",
     "redux-file-upload": "0.0.19",
     "redux-promise": "^0.5.3",
+    "reselect": "^3.0.1",
     "simple-line-icons": "^2.4.1",
     "ts-action": "^6.0.2",
     "typescript": "^2.8.3",

@@ -1,74 +1,70 @@
-import { Attack } from './interfaces/attack';
-import { Agent } from './interfaces/agent';
-import {
-	AgentList,
-	AttackList,
-	EventList,
-	SensorList, ServerList
-} from './honeyboxActions';
-import { Server } from './interfaces/server';
-import { Sensor } from './interfaces/sensor';
-import { ObjectMap } from '../shared/interfaces/objectMap';
+import { Event, SetMessageFilter, StdErr, StdOut } from './honeyboxActions';
+import { StdOutInterface } from './interfaces/stdOutInterface';
+import { uniqueId } from 'lodash'
+import { Message } from './interfaces/message';
 
-export interface HoneyfarmState {
-	events: ObjectMap<Event>;
-	attacks: ObjectMap<Attack>;
-	agents: ObjectMap<Agent>;
-	servers: ObjectMap<Server>;
-	sensors: ObjectMap<Sensor>;
+export interface HoneyboxState {
+	stdOut: StdOutInterface[];
+	messages: Message[];
+	messageFilter: string;
 }
 
-export const defaultHoneyfarmState: HoneyfarmState = {
-	events: {},
-	attacks: {},
-	agents: {},
-	servers: {},
-	sensors: {}
+export const defaultHoneyboxState: HoneyboxState = {
+	stdOut: [],
+	messages: [],
+	messageFilter: ''
 };
 
-const arrayToMap = (array: any[], idProp: string): ObjectMap<any> => {
-	const map = {};
+function b64DecodeUnicode(str) {
+	// Going backwards: from bytestream, to percent-encoding, to original string.
+	return decodeURIComponent(atob(str).split('').map(function(c) {
+		return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+	}).join(''));
+}
 
-	array.forEach(item => map[item[idProp]] = item);
-
-	return map;
-};
-
-export function honeyboxReducer(state: HoneyfarmState = defaultHoneyfarmState, action): HoneyfarmState {
-    console.log('action', action);
+export function honeyboxReducer(state: HoneyboxState = defaultHoneyboxState, action): HoneyboxState {
 	switch (action.type) {
-		case AgentList.type: {
+		case StdOut.type: {
+			const stdOut: StdOutInterface = {
+				id: uniqueId(),
+				data: b64DecodeUnicode(action.payload.data),
+				type: 'normal'
+			};
+
 			return {
 				...state,
-				agents: arrayToMap(action.payload.agents, 'agentId')
+				stdOut: state.stdOut.concat([stdOut])
 			};
 		}
 
-		case AttackList.type: {
+		case StdErr: {
+			const stdOut: StdOutInterface = {
+				id: uniqueId(),
+				data: b64DecodeUnicode(action.payload.data).replace('\n', '\r'),
+				type: 'error'
+			};
+
 			return {
 				...state,
-				attacks: arrayToMap(action.payload.attacks, 'agentId')
+				stdOut: state.stdOut.concat([stdOut])
 			};
 		}
 
-		case EventList.type: {
+		case Event.type: {
+			const message: Message = {
+				text: action.payload.text
+			};
+
 			return {
 				...state,
-				agents: arrayToMap(action.payload.agents, 'agentId')
+				messages: [message].concat(state.messages)
 			};
 		}
 
-		case SensorList.type: {
+		case SetMessageFilter.type: {
 			return {
 				...state,
-				sensors: arrayToMap(action.payload.sensors, 'sensorId')
-			};
-		}
-
-		case ServerList.type: {
-			return {
-				...state,
-				servers: arrayToMap(action.payload.servers, 'serverId')
+				messageFilter: action.payload.query
 			};
 		}
 

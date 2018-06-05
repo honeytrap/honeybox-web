@@ -16,9 +16,12 @@ import { AppState } from '../../../rootReducer';
 import {ResizableBox} from 'react-resizable';
 import * as throttle from 'lodash.throttle';
 
-import { XTerm, Terminal } from '../xterm';
+import XTerm from '../xterm';
 import StatusBar from '../statusBar/statusBar';
 import * as styles from './sandbox.css';
+import Network from '../network/network';
+import Syscalls from '../syscalls/syscalls';
+import Messages from '../messages/messages';
 
 interface Props {
 	dispatch: Dispatch<any>;
@@ -30,13 +33,10 @@ interface Props {
 
 interface Refs {
     [k: string]: any
-    xterm: XTerm;
 }
 
 interface State {
 }
-
-console.log(styles);
 
 class Sandbox extends React.Component<any, State> {
     render() {
@@ -64,10 +64,9 @@ class Sandbox extends React.Component<any, State> {
                                     />
                                 </main>
 
-                                <footer className={styles.footer}>
-                                    <div>Syscalls</div>
-                                    <div>Network</div>
-                                </footer>
+								<Messages/>
+								<Syscalls />
+								<Network />
                             </div>
 
                             <aside className={styles.aside}>

@@ -8,9 +8,9 @@ import {
 } from './authentication/authenticationReducer';
 import { combineReducers } from 'redux';
 import {
-	defaultHoneyfarmState,
+	defaultHoneyboxState,
 	honeyboxReducer,
-	HoneyfarmState
+	HoneyboxState
 } from './honeybox/honeyboxReducer';
 
 export const rootReducer = combineReducers({
@@ -23,11 +23,11 @@ export const rootReducer = combineReducers({
 export interface AppState {
 	authentication: AuthenticationState;
 	connection: ConnectionState;
-	honeyfarm: HoneyfarmState;
+	honeyfarm: HoneyboxState;
 }
 
 export const defaultAppState: AppState = {
 	authentication: defaultAuthenticationState,
 	connection: defaultConnectionState,
-	honeyfarm: defaultHoneyfarmState
+	honeyfarm: defaultHoneyboxState
 };
