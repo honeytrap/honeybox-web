@@ -88,7 +88,13 @@ function onClose(event, dispatch: Dispatch<any>) {
 }
 
 function getUrl(): string {
-    return process.env.SERVER_URI;
+	const fromEnv: string = process.env.SERVER_URI;
+
+	if (fromEnv) {
+		return fromEnv;
+	}
+
+    return 'ws://' + window.location.hostname + ':' + window.location.port + '/ws';
 }
 
 function getCloseMessage(event: CloseEvent): string {
