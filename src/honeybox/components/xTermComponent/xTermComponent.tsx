@@ -121,10 +121,14 @@ class XTermComponent extends React.Component<IXtermProps, IXtermState> {
         this.props.onContextMenu && this.props.onContextMenu(e);
     }
 
-    prompt() {
-    	const { dispatch } = this.props;
+    sendToServer(string: string) {
+		const { dispatch } = this.props;
 
-		dispatch(new StdIn({ data: this.input + "\n"}));
+		dispatch(new StdIn({ data: string }));
+	}
+
+    prompt() {
+    	this.sendToServer(this.input + '\n');
 		this.input = '';
 		this.xterm.write('\r\n');
 	}
@@ -152,21 +156,21 @@ class XTermComponent extends React.Component<IXtermProps, IXtermState> {
 		this.xterm.write('$ ');
 
 		this.xterm.on('key',  (key, ev) => {
-			var printable = (
+			const printable = (
 				!ev.altKey && !ev.ctrlKey && !ev.metaKey
 			);
 
 			if (ev.keyCode == 13) {
-				this.prompt();
+				this.sendToServer('\n');
+				this.xterm.write('\r\n');
 
-				// } else if (ev.keyCode == 8) {
-				//   // Do not delete the prompt
-				//   if (term['x'] > 2) {
-				//     xterm.write('\b \b');
-				//   }
+			} else if (ev.which === 8) {
+				this.sendToServer('\x08');
+				// this.xterm.write(key);
+
 			} else if (printable) {
+				this.sendToServer(key);
 				this.xterm.write(key);
-				this.input += key;
 			}
 		});
 
